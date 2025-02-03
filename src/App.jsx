@@ -1,37 +1,44 @@
 import "./App.css";
 // react hooks
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import Resultados from "./Resultados";
 
-const number = Math.trunc(Math.random() * 20) + 1;
+const secretNumber = Math.trunc(Math.random() * 20) + 1;
 
 function App() {
   const [score, setScore] = useState(20);
   const [highscore, setHighscore] = useState(0);
+  const [guessNumber, setGuessNumber] = useState("");
   const inputRef = useRef(null);
 
   const handleCheck = () => {
     // comprobar si el valor introducido es igual al número aleatorio
-    const inputNumber = inputRef.current.value;
-    if (inputNumber === number) {
-      // hemos ganado
-    } else if (inputNumber > number) {
-      // el valor introducido es mayor que el número aleatorio
-      // poner mensaje ¿setMessage y usar state message?
+    setGuessNumber(Number(inputRef.current.value));
+  };
+
+  // arrow functions () => {}
+  useEffect(() => {
+    if (!Number(guessNumber)) return;
+    if (guessNumber === secretNumber) {
+      // if (score > highscore) setHighscore(score);
+      setHighscore(Math.max(score, highscore));
     } else {
       // el valor introducido es menor que el número aleatorio
-      // poner mensaje
+      setScore(score - 1);
     }
-
-    setScore(score - 1);
-  };
+  }, [guessNumber]);
 
   return (
     <>
       <header>
         <h1>Guess My Number!</h1>
-        <p className="between">(Between 1 and 20)</p>
+        <p className="between">
+          (Between 1 and 20 but it is {secretNumber} )
+        </p>{" "}
         <button className="btn again">Again!</button>
-        <div className="number">?</div>
+        <div className="number">
+          {guessNumber === secretNumber ? secretNumber : "?"}
+        </div>
       </header>
       <main>
         <section className="left">
@@ -40,15 +47,12 @@ function App() {
             Check!
           </button>
         </section>
-        <section className="right">
-          <p className="message">Start guessing...</p>
-          <p className="label-score">
-            💯 Score: <span className="score">{score}</span>
-          </p>
-          <p className="label-highscore">
-            🥇 Highscore: <span className="highscore">{highscore}</span>
-          </p>
-        </section>
+        <Resultados
+          score={score}
+          highscore={highscore}
+          guessNumber={guessNumber}
+          secretNumber={secretNumber}
+        />
       </main>
     </>
   );
